@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include "include/mss.h"
+#include "decodebase64.h"
 
 static VALUE t_init(VALUE self)
 {
@@ -7,12 +8,8 @@ static VALUE t_init(VALUE self)
 }
 
 static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_key) {
-  char *message;
-  int message_len;
-  char *signature;
-  int signature_len;
-  char *key;
-  int key_len;
+  char *message, *signature, *key;
+  int message_len, signature_len, key_len;
   VALUE str;
 
   // convert VALUE to string for r_message, r_signature, r_key
@@ -25,6 +22,11 @@ static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_ke
   str = StringValue(r_key);
   key = RSTRING_PTR(str);
   key_len = RSTRING_LEN(str);
+
+  unsigned char output[100];
+  int outLen;
+  base64decode(message, message_len, output, &outLen);
+  printf("str %s", output);
 
 //
 //unsigned char mss_verify(struct mss_node authpath[MSS_HEIGHT], const unsigned char *v, const char *M, unsigned short len,
