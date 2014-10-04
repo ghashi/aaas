@@ -23,17 +23,37 @@ static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_ke
   key = RSTRING_PTR(str);
   key_len = RSTRING_LEN(str);
 
-  unsigned char output[100];
-  int outLen;
-  base64decode(message, message_len, output, &outLen);
-  printf("str %s", output);
+  printf("message %s %d\n", message, message_len);
+  printf("signature %s %d\n", signature, signature_len);
+  printf("key %s %d\n", key, key_len);
+  base64decode(message, message_len, message, &message_len);
+  base64decode(signature, signature_len, signature, &signature_len);
+  base64decode(key, key_len, key, &key_len);
+  printf("\nmessage %s %d\n", message, message_len);
+  printf("signature %s %d\n", signature, signature_len);
+  printf("key %s %d\n", key, key_len);
 
 //
 //unsigned char mss_verify(struct mss_node authpath[MSS_HEIGHT], const unsigned char *v, const char *M, unsigned short len,
 //                         mmo_t *mmo, dm_t *f, unsigned char *h, unsigned short leaf_index, const unsigned char *sig,
 //                         unsigned char *x, struct mss_node *currentLeaf, unsigned char merklePubKey[NODE_VALUE_SIZE]);
 
-//#DECLARAR
+  /* Auxiliary varibles */
+  struct mss_node node[3];
+  unsigned char hash[LEN_BYTES(WINTERNITZ_N)];
+  unsigned char signature[WINTERNITZ_L*LEN_BYTES(WINTERNITZ_SEC_LVL)];
+  unsigned char aux[LEN_BYTES(WINTERNITZ_SEC_LVL)];
+  mmo_t hash_mmo;
+  dm_t hash_dm;
+  /* Merkle-tree variables */
+  struct mss_node authpath[MSS_HEIGHT];
+  unsigned char pkey[NODE_VALUE_SIZE];
+  /* Initialization of Merkle–Damgård hash */
+  DM_init(&hash_dm);
+  /* Initialization of Winternitz-MMO OTS */
+  sinit(&hash_mmo, MSS_SEC_LVL);
+
+  //#DECLARAR
 //  mmo
 //  f
 //  *h
