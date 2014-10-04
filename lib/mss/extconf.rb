@@ -1,2 +1,3 @@
 require 'mkmf'
-create_makefile("mss_wrapper")
+$CFLAGS += " -DMSS_CALC_RETAIN -I include"
+create_makefile("mss_wrapper", 'src')

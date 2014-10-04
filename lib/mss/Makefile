@@ -10,7 +10,7 @@ ECHO = $(ECHO1:0=@echo)
 
 #### Start of system configuration section. ####
 
-srcdir = .
+srcdir = src
 topdir = /home/guilherme/.rvm/rubies/ruby-2.1.2/include/ruby-2.1.0
 hdrdir = $(topdir)
 arch_hdrdir = /home/guilherme/.rvm/rubies/ruby-2.1.2/include/ruby-2.1.0/x86_64-linux
@@ -78,7 +78,7 @@ optflags = -O3 -fno-fast-math
 debugflags = -ggdb3
 warnflags = -Wall -Wextra -Wno-unused-parameter -Wno-parentheses -Wno-long-long -Wno-missing-field-initializers -Wunused-variable -Wpointer-arith -Wwrite-strings -Wdeclaration-after-statement -Wimplicit-function-declaration
 CCDLFLAGS = -fPIC
-CFLAGS   = $(CCDLFLAGS) $(cflags)  -fPIC $(ARCH_FLAG)
+CFLAGS   = $(CCDLFLAGS) $(cflags)  -fPIC -DMSS_CALC_RETAIN -I include $(ARCH_FLAG)
 INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir)
 DEFS     = 
 CPPFLAGS =   $(DEFS) $(cppflags)
@@ -133,10 +133,10 @@ extout_prefix =
 target_prefix = 
 LOCAL_LIBS = 
 LIBS = $(LIBRUBYARG_SHARED)  -lpthread -ldl -lcrypt -lm   -lc
-ORIG_SRCS = decodebase64.c mss_wrapper.c
+ORIG_SRCS = mss.c sponge.c test.c winternitz.c mmo.c decodebase64.c TI_aes.c mss_wrapper.c benchmark.c
 SRCS = $(ORIG_SRCS) 
-OBJS = decodebase64.o mss_wrapper.o
-HDRS = $(srcdir)/decodebase64.h
+OBJS = mss.o sponge.o test.o winternitz.o mmo.o decodebase64.o TI_aes.o mss_wrapper.o benchmark.o
+HDRS = 
 TARGET = mss_wrapper
 TARGET_NAME = mss_wrapper
 TARGET_ENTRY = Init_$(TARGET_NAME)
