@@ -1,5 +1,9 @@
 #include "ruby.h"
 #include "mss.h"
+#include "winternitz.h"
+#include "sponge.h"
+#include "mmo.h"
+#include "TI_aes.h"
 #include "decodebase64.h"
 
 static VALUE t_init(VALUE self) {
@@ -22,7 +26,7 @@ void deserialize_mss_node(struct mss_node *node, const char buffer[], int *offse
   }
 }
 
-void deserialze(unsigned char *ots, unsigned short *index, struct mss_node *v, struct mss_node authpath[MSS_HEIGHT], const char *signature, int signatura_size) {
+void deserialze(unsigned char *ots, unsigned short *index, struct mss_node *v, struct mss_node authpath[MSS_HEIGHT], const char *signature, int signature_size) {
   int i;
   int offset = 0;
 
@@ -32,12 +36,12 @@ void deserialze(unsigned char *ots, unsigned short *index, struct mss_node *v, s
   for(i = 0; i < MSS_HEIGHT; i++)
     deserialize_mss_node(&authpath[i], signature, &offset);
 
-  for(i = 0; offset < signatura_size; offset++)
+  for(i = 0; offset < signature_size; offset++)
     ots[i++] = signature[offset];
 }
 
 static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_key) {
-  char *message, *signature, *key;
+  char *message, *signature, *pkey_b64;
   int message_len, signature_len, key_len;
   VALUE str;
 
@@ -62,12 +66,12 @@ static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_ke
   signature = RSTRING_PTR(str);
   signature_len = RSTRING_LEN(str);
   str = StringValue(r_key);
-  key = RSTRING_PTR(str);
+  pkey_b64 = RSTRING_PTR(str);
   key_len = RSTRING_LEN(str);
 
   base64decode(message, message_len, message, &message_len);
   base64decode(signature, signature_len, signature, &signature_len);
-  base64decode(key, key_len, key, &key_len);
+  base64decode(pkey_b64, key_len, pkey, &key_len);
 
   /* Initialization of Merkle–Damgård hash */
   DM_init(&hash_dm);
@@ -75,8 +79,7 @@ static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_ke
   sinit(&hash_mmo, MSS_SEC_LVL);
 
   deserialze(ots, &index, &node, authpath, signature, signature_len);
-  if(mss_verify(authpath, node.value, message, strlen(message) + 1, &hash_mmo, &hash_dm, hash, index, signature, aux, &node, pkey)){
-    printf("hahah");
+  if(mss_verify(authpath, node.value, message, message_len + 1, &hash_mmo, &hash_dm, hash, index, ots, aux, &node, pkey)){
     return Qtrue;
   }
   return Qfalse;
