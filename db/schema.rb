@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20141003233553) do
+ActiveRecord::Schema.define(version: 20141024222223) do
 
   create_table "users", force: true do |t|
     t.string   "name"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20141003233553) do
     t.string   "pkey"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "nonce"
   end
 
 end
