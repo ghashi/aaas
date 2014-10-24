@@ -2,28 +2,14 @@ class Api::V1::UsersController < ApplicationController
   def login
     begin
       decrypted_params = decrypt params
-      if is_valid decrypted_params[:token]
-        count = Integer(decrypted_params[:token][:count])
-        if is_count_valid(count)
-          user = User.find decrypted_params[:id]
-          if count > user.token_count
-            user.token_count = count
-            if CryptoWrapper.verify(params[:token], params[:sig], user.pkey ) && user.save
-              render json: {session_key: session_key}
-            else
-              user.destroy
-              head :bad_request
-            end
-          else
-            p "invalid count(> #{user.token_count})"
-            head :bad_request
-          end
-        else
-          p "invalid count (> 1023)"
-        end
+      is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
+      is_count_valid(count) ? user = User.find(decrypted_params[:id]) : raise("invalid count (> 1024)")
+      count > user.token_count ? user.token_count = count : raise("count (#{count}) < user.count (#{user.token_count})")
+      if CryptoWrapper.verify(params[:token], params[:sig], user.pkey ) && user.save
+        render json: {session_key: session_key}
       else
-        p "invalid token"
-        head :bad_request
+        user.destroy
+        raise "user destroyed due to invalid request"
       end
     rescue Exception => e
       puts e.message

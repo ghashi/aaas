@@ -14,27 +14,21 @@ RSpec.describe Api::V1::UsersController, :type => :controller do
         expect(response.body).to eq session_key.to_json
       end
 
-      it "but token_count is invalid, then it should return bad request response" do
-        fake_user = FactoryGirl.create(:user, token_count: 1025)
-        post :login, id: fake_user.id, token: {}, sig: "sig" , supplicant: "sup"
-        expect(response.status).to eq 400
-      end
-
       it "but verify returns false, then it should return bad request response" do
         allow(CryptoWrapper).to receive(:verify).and_return(false)
         post :login, id: user.id, token: {key: "1x1", timestamp: "11", count: "12", index: "13" }, sig: "sig" , supplicant: "sup"
         expect(response.status).to eq 400
       end
 
-      it "but user token_count is higher than 12, then it should return bad request response" do
-        fake_user = FactoryGirl.create(:user, token_count: 13)
-        post :login, id: fake_user.id, token: {key: "1x1", timestamp: "11", count: "12", index: "13" }, sig: "sig" , supplicant: "sup"
+      it "but user count is lower than 12, then it should return bad request response" do
+        fake_user = FactoryGirl.create(:user, token_count: 12)
+        post :login, id: fake_user.id, token: {key: "1x1", timestamp: "11", count: "11", index: "13" }, sig: "sig" , supplicant: "sup"
         expect(response.status).to eq 400
       end
 
-      it "but user token_count is higher than 1024, then it should return bad request response" do
+      it "but user count is higher than 1024, then it should return bad request response" do
         fake_user = FactoryGirl.create(:user, token_count: 1025)
-        post :login, id: fake_user.id, token: {key: "1x1", timestamp: "11", count: "12", index: "13" }, sig: "sig" , supplicant: "sup"
+        post :login, id: fake_user.id, token: {key: "1x1", timestamp: "11", count: "1025", index: "13" }, sig: "sig" , supplicant: "sup"
         expect(response.status).to eq 400
       end
     end
