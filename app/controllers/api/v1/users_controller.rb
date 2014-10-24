@@ -17,6 +17,18 @@ class Api::V1::UsersController < ApplicationController
     end
   end
 
+  def register
+    begin
+      nonce = User.find(params[:id]).nonce
+      return head :bad_request unless CryptoWrapper.verify_hmac(params[:tag], params[:csr], nonce)
+      # TODO
+      render json: {certificate: "certificate"}
+    rescue Exception => e
+      puts e.message
+      head :bad_request
+    end
+  end
+
   private
 
   def decrypt(params)

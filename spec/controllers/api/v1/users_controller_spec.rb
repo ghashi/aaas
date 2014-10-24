@@ -40,4 +40,27 @@ RSpec.describe Api::V1::UsersController, :type => :controller do
       end
     end
   end
+
+  describe "POST #register" do
+    let(:user) {FactoryGirl.create(:user)}
+    let(:certificate){
+      {certificate: "certificate"}
+    }
+
+    it "if HMAC is ok, should return the certificate" do
+      post :register, id: user.id, csr: "csr" , tag: "tag"
+      expect(response.body).to eq certificate.to_json
+    end
+
+    it "if HMAC isnt ok, should return the bad request response" do
+      pending "verify hmac should be implemented"
+      post :register, id: user.id, csr: "csr" , tag: "tag"
+      expect(response.status).to eq 400
+    end
+
+    it "if user isnt found, should return the bad request response" do
+      post :register,csr: "csr" , tag: "tag"
+      expect(response.status).to eq 400
+    end
+  end
 end

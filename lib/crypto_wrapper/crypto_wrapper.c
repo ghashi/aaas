@@ -7,6 +7,10 @@ static VALUE t_init(VALUE self){
 }
 
 
+static VALUE t_verify_hmac(VALUE self, VALUE tag, VALUE msg, VALUE key){
+  return Qtrue;
+}
+
 static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_key){
   unsigned char *message, *signature, *pkey;
   int message_len, signature_len, key_len;
@@ -40,4 +44,5 @@ void Init_crypto_wrapper() {
   cCryptoWrapper = rb_define_class("CryptoWrapper", rb_cObject);
   rb_define_method(cCryptoWrapper, "initialize", t_init, 0);
   rb_define_singleton_method(cCryptoWrapper, "verify", t_verify, 3);
+  rb_define_singleton_method(cCryptoWrapper, "verify_hmac", t_verify_hmac, 3);
 }
