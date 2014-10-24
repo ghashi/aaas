@@ -41,5 +41,3 @@ void Init_crypto_wrapper() {
   rb_define_method(cCryptoWrapper, "initialize", t_init, 0);
   rb_define_singleton_method(cCryptoWrapper, "verify", t_verify, 3);
 }
-
-
