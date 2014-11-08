@@ -1,7 +1,7 @@
 class Api::V1::UsersController < ApplicationController
   def login
     begin
-      decrypted_params = decrypt params
+      decrypted_params = asymmetric_decrypt params
       is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
       is_count_valid(count) ? user = User.find(decrypted_params[:id]) : raise("invalid count (> 1024)")
       count > user.token_count ? user.token_count = count : raise("count (#{count}) < user.count (#{user.token_count})")
@@ -31,7 +31,7 @@ class Api::V1::UsersController < ApplicationController
 
   private
 
-  def decrypt(params)
+  def asymmetric_decrypt(params)
     #TODO
     params
   end
