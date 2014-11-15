@@ -20,7 +20,9 @@ ntru:		$(NTRU_SRC_DIR)/ntru.c
 
 ecdsa:		$(uECC)/uECC.c
 		$(CC) $(uECC)/uECC.c -c -o bin/$@.o $(CFLAGS)
-		$(CC) $(uECC)/test/test_ecdsa.c -o bin/$@ bin/$@.o $(CFLAGS)
+		$(CC) $(uECC)/test/test_ecdsa.c -o bin/lib$@ bin/$@.o $(CFLAGS)
+		$(CC) $(HASHBASEDSIG_SRC)/util.c -c -o bin/util.o $(CFLAGS) 
+		$(CC) $@.c -o bin/$@ -DECDSA_SELFTEST -DDEBUG bin/$@.o bin/util.o $(CFLAGS)
 
 certificate:	certificate.c
 		$(CC) $(HASHBASEDSIG_SRC)/util.c -c -o bin/util.o $(CFLAGS) 

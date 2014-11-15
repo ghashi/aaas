@@ -15,6 +15,7 @@
  */
 
 #include "mss.h"
+#include "ECDSA.h"
 
 #define ISO8601_TIME_SIZE	25
 #define SMQV_PKEY_SIZE		2 * 32	// Non-compressed form
@@ -22,7 +23,6 @@
 #define CSR_MAX_SIZE	(2 * (MSS_SIGNATURE_SIZE + MSS_PKEY_SIZE + SMQV_PKEY_SIZE + ISO8601_TIME_SIZE + 40))
 #define CSR_DIGEST_LEN ((2 * MSS_SEC_LVL) / 8)
 
-#define ECDSA_SIGNATURE_SIZE 42 // uECC_CURVE secp160r1
 #define CERTIFICATE_MAX_SIZE	(2 * (ECDSA_SIGNATURE_SIZE + MSS_PKEY_SIZE + SMQV_PKEY_SIZE + ISO8601_TIME_SIZE + 40))
 
 void generate_csr(unsigned int id, char *cname, char time[ISO8601_TIME_SIZE], unsigned char auth_key[SMQV_PKEY_SIZE], unsigned char token_key[MSS_PKEY_SIZE], unsigned char csr_signature[MSS_SIGNATURE_SIZE], char csr[CSR_MAX_SIZE]);
