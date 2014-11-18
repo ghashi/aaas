@@ -16,7 +16,8 @@ ntru:		$(NTRU_SRC_DIR)/ntru.c
 		$(foreach src, $(NTRU_SRC), $(CC) $(NTRU_SRC_DIR)/$(src).c -c -o bin/$(src).o $(CFLAGS);)
 		$(foreach src, $(NTRU_TESTS), $(CC) $(NTRU_TESTS_DIR)/$(src).c -c -o bin/$(src).o $(CFLAGS);)
 		$(CC) $(NTRU_TESTS_DIR)/test.c -o bin/lib$@ $(NTRU_OBJS) $(CFLAGS)
-		$(CC) $@.c -o bin/$@ -DNTRU_SELFTEST $(NTRU_OBJS) $(CFLAGS)
+		$(CC) $(HASHBASEDSIG_SRC)/util.c -c -o bin/util.o $(CFLAGS) 
+		$(CC) $@.c -o bin/$@ -DNTRU_SELFTEST -DDEBUG $(NTRU_OBJS) bin/util.o $(CFLAGS)
 
 ecdsa:		$(uECC)/uECC.c
 		$(CC) $(uECC)/uECC.c -c -o bin/$@.o $(CFLAGS)
