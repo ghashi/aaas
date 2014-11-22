@@ -116,7 +116,9 @@ void generate_certificate(const unsigned char csr[CSR_MAX_SIZE], const char vali
 	unsigned char buffer[CERTIFICATE_MAX_SIZE];
 	memset(buffer, 0, CERTIFICATE_MAX_SIZE);
 
-	if(read_csr(&id, cname, time, auth_key, token_key, csr_signature, csr)) {
+	now(&time);
+
+	if(compare_dates(valid, time) == -1 && read_csr(&id, cname, time, auth_key, token_key, csr_signature, csr)) {
 		unsigned int index = 0;
 
 		index += cert_append_info(buffer, id, cname, time, valid, auth_key, token_key);
@@ -129,8 +131,12 @@ void generate_certificate(const unsigned char csr[CSR_MAX_SIZE], const char vali
 
 		base64encode(buffer, index, certificate, CSR_MAX_SIZE);
 	}
-	else
-		printf("Authentication ERROR: !mss_verify\n");
+	else{
+		if( compare_dates(valid, time) != -1)
+			printf("Authentication ERROR: !(valid > t_now)\n");
+		else
+			printf("Authentication ERROR: !mss_verify\n");
+  }
 }
 
 // return 1 if certificate is valid, 0 otherwise
@@ -197,6 +203,14 @@ int main() {
 	unsigned int id = rand(), i;
 	char cname[CNAME_MAX_SIZE], time[TIME_BUFFER_SIZE], valid[TIME_BUFFER_SIZE], csr[CSR_MAX_SIZE], csr_cpy[CSR_MAX_SIZE], certificate[CERTIFICATE_MAX_SIZE], certificate_cpy[CERTIFICATE_MAX_SIZE];
 	unsigned char auth_key[SMQV_PKEY_SIZE], token_keypair[MSS_SKEY_SIZE + MSS_PKEY_SIZE], token_skey[MSS_SKEY_SIZE], token_pkey[MSS_PKEY_SIZE], csr_signature[MSS_SIGNATURE_SIZE], signature[ECDSA_SIGNATURE_SIZE];
+
+  // valid: 3333XXXXXXXXXX
+  now(&valid);
+  valid[0] = '3';
+  valid[1] = '3';
+  valid[2] = '3';
+  valid[3] = '3';
+
 
 	sprintf(cname, "TESTE do CERTIFICATE");
 
