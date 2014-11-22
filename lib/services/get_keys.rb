@@ -1,5 +1,5 @@
 class GetKeys
-  # returns [skey, pkey]
+  # returns [ecdsa_skey, ecdsa_pkey, ntru_skey, ntru_pkey]
   def self.call
   @keys = []
     if @keys.empty?

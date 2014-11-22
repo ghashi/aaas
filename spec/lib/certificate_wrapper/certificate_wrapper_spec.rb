@@ -24,4 +24,12 @@ describe CertificateWrapper do
       expect(CertificateWrapper.ntru_keygen().size).to eq 2
     end
   end
+  describe "#ntru_encrypt and #ntru_decrypt" do
+    it "generates an encrypted text and decrypts to Msg teste" do
+      encrypted_response = CertificateWrapper.ntru_encrypt(CertificateWrapper.ntru_pkey, "Msg teste")
+      expect(encrypted_response.size).to be > 0
+      decrypted_response = CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, encrypted_response)
+      expect(decrypted_response).to eq 'Msg teste'
+    end
+  end
 end
