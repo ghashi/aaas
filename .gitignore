@@ -16,4 +16,7 @@
 /tmp
 
 *.o
+*.swp
+*.swo
+bin
 lib/crypto_wrapper/mkmf.log

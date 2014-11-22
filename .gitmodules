@@ -1,0 +1,9 @@
+[submodule "lib/certificate/hashbasedsignature-code"]
+	path = lib/certificate/hashbasedsignature-code
+	url = ssh://puodzius@git.code.sf.net/p/hashbasedsignature/code
+[submodule "lib/certificate/micro-ecc"]
+	path = lib/certificate/micro-ecc
+	url = https://github.com/kmackay/micro-ecc.git
+[submodule "lib/certificate/libntru"]
+	path = lib/certificate/libntru
+	url = https://github.com/tbuktu/libntru.git
