@@ -6,4 +6,9 @@ describe CertificateWrapper do
       CertificateWrapper.generate_certificate()
     end
   end
+  context "#ecdsa_keygen" do
+    it "generates the pair of keys [skey, pkey]" do
+      expect(CertificateWrapper.ecdsa_keygen().size).to eq 2
+    end
+  end
 end
