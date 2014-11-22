@@ -144,6 +144,9 @@ unsigned char read_certificate(unsigned int *id, char *cname, char time[TIME_BUF
 	unsigned int index = 0;
 	int certificate_size = CERTIFICATE_MAX_SIZE;
 	unsigned char buffer[CERTIFICATE_MAX_SIZE];
+	char t_now[TIME_BUFFER_SIZE];
+
+	now(&t_now);
 	memset(buffer, 0, CERTIFICATE_MAX_SIZE);
 	base64decode(certificate, strlen(certificate), buffer, &certificate_size);
 
@@ -154,7 +157,7 @@ unsigned char read_certificate(unsigned int *id, char *cname, char time[TIME_BUF
         sponge_hash(buffer, index, cert_digest, 2 * MSS_SEC_LVL);
 
 	// verify [(id || cname || time || valid || auth_key || token_key), csr_signature, token_key]
-	return ecdsa_verify(ca_pkey, cert_digest, cert_signature);
+	return compare_dates(t_now, time) <= 0 && compare_dates(t_now, valid) >= 0 && ecdsa_verify(ca_pkey, cert_digest, cert_signature);
 }
 
 unsigned int cert_append_info(unsigned char buffer[], unsigned int id, const char *cname, const char time[TIME_BUFFER_SIZE], const char valid[TIME_BUFFER_SIZE], const unsigned char auth_key[SMQV_PKEY_SIZE], const unsigned char token_key[MSS_PKEY_SIZE]) {
