@@ -1,5 +1,6 @@
 #include "ruby.h"
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #include "certificate.h"
 
@@ -7,18 +8,25 @@ static VALUE t_init(VALUE self){
   return self;
 }
 
-static VALUE t_generate_certificate(VALUE self, VALUE csr, VALUE valid, VALUE ca_key){
-  //unsigned int id = rand();
-  //char cname[CNAME_MAX_SIZE];
-  //unsigned char auth_key[SMQV_PKEY_SIZE];
-  //unsigned char token_pkey[MSS_PKEY_SIZE];
-  //unsigned char token_skey[MSS_SKEY_SIZE];
-  //char csr_[CSR_MAX_SIZE];
-  //generate_csr(id, cname, auth_key, token_pkey, token_skey, csr_);
-  //char certificate[CERTIFICATE_MAX_SIZE]; // saida
-  //generate_certificate(csr, valid, ca_skey, certificate);
-  //printf("%s\n", csr);
-  return Qtrue;
+static VALUE t_generate_certificate(VALUE self, VALUE r_csr, VALUE r_valid, VALUE r_ca_skey){
+  unsigned char *csr;
+           char *valid;
+  unsigned char *ca_skey;
+  unsigned char certificate[CERTIFICATE_MAX_SIZE];
+  unsigned int  csr_len;
+  unsigned int  valid_len;
+  unsigned int  ca_skey_len;
+  VALUE str;
+
+  str         = StringValue(r_csr);
+  csr         = RSTRING_PTR(str);
+  str         = StringValue(r_valid);
+  valid       = RSTRING_PTR(str);
+  str         = StringValue(r_ca_skey);
+  ca_skey     = RSTRING_PTR(str);
+
+  generate_certificate(csr, valid, ca_skey, certificate);
+  return rb_str_new2(certificate);
 }
 
 static VALUE t_ecdsa_keygen(VALUE self){
