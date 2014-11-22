@@ -34,7 +34,8 @@ certificate:	certificate.c
 		$(MAKE) -C $(HASHBASEDSIG_RoR_PROJ) sponge mss
 		$(foreach obj, $(HASHBASEDSIG_OBJS), cp $(HASHBASEDSIG_RoR_PROJ)/$(HASHBASEDSIG_SPOGE_MSS_OBJS)/$(obj) $(obj);)
 		rm -rf $(HASHBASEDSIG_RoR_PROJ)/bin
-		$(CC) $@.c -o bin/$@ -DCERTIFICATE_SELFTEST $(HASHBASEDSIG_OBJS) $(ECDSA_OBJS) $(CFLAGS)
+		$(CC) cert_time.c -c -o bin/cert_time.o $(CFLAGS)
+		$(CC) $@.c -o bin/$@ -DCERTIFICATE_SELFTEST $(HASHBASEDSIG_OBJS) $(ECDSA_OBJS) bin/cert_time.o $(CFLAGS)
 
 clean:		
 		rm -rf bin/*
