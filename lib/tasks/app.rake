@@ -6,11 +6,14 @@ namespace :app do
     Rake::Task['db:reset'].invoke
     p "Users detroyed!"
 
-    keys = CertificateWrapper.ecdsa_keygen()
+    ecdsa_keys = CertificateWrapper.ecdsa_keygen()
+    ntru_keys = CertificateWrapper.ntru_keygen()
     out_file = File.new("config/keys", "w")
-    out_file.puts(keys[0])
-    out_file.puts(keys[1])
+    out_file.puts(ecdsa_keys[0])
+    out_file.puts(ecdsa_keys[1])
+    out_file.puts(ntru_keys[0])
+    out_file.puts(ntru_keys[1])
     out_file.close
-    p "New pair of keys generated!"
+    p "New keys (NTRU, ECDSA) generated!"
   end
 end
