@@ -2,3 +2,4 @@
 
 Run rake: db:migrate
 Run rake: app:restart
+Import/Generate C libs

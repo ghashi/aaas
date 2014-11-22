@@ -9,7 +9,6 @@ INCLUDEDIR  = RbConfig::CONFIG['includedir']
 HEADER_DIRS = [INCLUDEDIR,
                Dir.pwd + "/certificate/hashbasedsignature-code/workspace/include",
                Dir.pwd + "/certificate/micro-ecc",
-               Dir.pwd + "/certificate/libntru/src",
                Dir.pwd + "/certificate"]
 
 LIB_DIRS = [LIBDIR, Dir.pwd + "/certificate/bin"]
@@ -18,6 +17,10 @@ dir_config('certificate_wrapper', HEADER_DIRS, LIB_DIRS)
 
 unless find_header('certificate.h')
   abort "certificate.h is missing"
+end
+
+unless find_header('ntru.h')
+  abort "ntru.h is missing"
 end
 
 unless have_library('crypto', 'mss_verify')

@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "certificate.h"
+#include "ntru.h"
 
 static VALUE t_init(VALUE self){
   return self;
@@ -46,6 +47,23 @@ static VALUE t_ecdsa_keygen(VALUE self){
   return key_list;
 }
 
+static VALUE t_ntru_keygen(VALUE self){
+	unsigned char skey[NTRU_SKEY_SIZE];
+  unsigned char pkey[NTRU_PKEY_SIZE];
+  unsigned char encoded_skey[2*NTRU_SKEY_SIZE];
+  unsigned char encoded_pkey[2*NTRU_PKEY_SIZE];
+  VALUE key_list = rb_ary_new();
+
+  ntru_keygen(skey, pkey);
+  base64encode(skey, NTRU_PKEY_SIZE, encoded_skey, 2 * NTRU_PKEY_SIZE);
+  base64encode(pkey, NTRU_PKEY_SIZE, encoded_pkey, 2 * NTRU_PKEY_SIZE);
+
+  rb_ary_push(key_list, rb_str_new2(encoded_skey));
+  rb_ary_push(key_list, rb_str_new2(encoded_pkey));
+
+  return key_list;
+}
+
 VALUE cCertificateWrapper;
 
 void Init_certificate_wrapper() {
@@ -53,4 +71,5 @@ void Init_certificate_wrapper() {
   rb_define_method(cCertificateWrapper, "initialize", t_init, 0);
   rb_define_singleton_method(cCertificateWrapper, "generate_certificate", t_generate_certificate, 3);
   rb_define_singleton_method(cCertificateWrapper, "ecdsa_keygen", t_ecdsa_keygen, 0);
+  rb_define_singleton_method(cCertificateWrapper, "ntru_keygen", t_ntru_keygen, 0);
 }
