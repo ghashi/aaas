@@ -27,13 +27,14 @@ unsigned int cert_split_info(const unsigned char buffer[], unsigned int *id, cha
  *				- csr_signature: CSR signature under token_key
  *
  */
-void generate_csr(unsigned int id, char *cname, char time[TIME_BUFFER_SIZE], unsigned char auth_key[SMQV_PKEY_SIZE], unsigned char token_key[MSS_PKEY_SIZE], unsigned char mss_skey[MSS_SKEY_SIZE], char csr[CSR_MAX_SIZE]) {
+void generate_csr(unsigned int id, char *cname, unsigned char auth_key[SMQV_PKEY_SIZE], unsigned char token_key[MSS_PKEY_SIZE], unsigned char mss_skey[MSS_SKEY_SIZE], char csr[CSR_MAX_SIZE]) {
 	// append byte array of (id || cname || time || auth_key || token_key)
 	unsigned int index = 0;
 	unsigned char buffer[CSR_MAX_SIZE];
 	memset(buffer, 0, CSR_MAX_SIZE);
 	memset(csr, 0, CSR_MAX_SIZE);
-
+	char time[TIME_BUFFER_SIZE];
+	now(&time);
 	index += csr_append_info(buffer, id, cname, time, auth_key, token_key);
 
 	// sign (id || cname || time || auth_key || token_key)
@@ -68,7 +69,7 @@ unsigned char read_csr(unsigned int *id, char *cname, char time[TIME_BUFFER_SIZE
 unsigned int csr_append_info(unsigned char buffer[], unsigned int id, const char *cname, const char time[TIME_BUFFER_SIZE], const unsigned char auth_key[SMQV_PKEY_SIZE], const unsigned char token_key[MSS_PKEY_SIZE]) {
 	unsigned int index = 0;
 	sprintf(buffer, "%u %s", id, cname);
-	index += strlen(buffer);
+	index += strlen(buffer) + 1;
 	memcpy(buffer + index, time, TIME_BUFFER_SIZE);
 	index += TIME_BUFFER_SIZE;
 	memcpy(buffer + index, auth_key, SMQV_PKEY_SIZE);
@@ -83,7 +84,7 @@ unsigned int csr_split_info(const unsigned char buffer[], unsigned int *id, char
 	sscanf(buffer, "%u ", id);
 	while(buffer[index++] != ' ');
 	strcpy(cname, buffer + index);
-	index += strlen(cname);
+	index += strlen(cname) + 1;
 	memcpy(time, buffer + index, TIME_BUFFER_SIZE);
 	index += TIME_BUFFER_SIZE;
 	memcpy(auth_key, buffer + index, SMQV_PKEY_SIZE);
@@ -151,7 +152,7 @@ unsigned char read_certificate(unsigned int *id, char *cname, char time[TIME_BUF
 unsigned int cert_append_info(unsigned char buffer[], unsigned int id, const char *cname, const char time[TIME_BUFFER_SIZE], const char valid[TIME_BUFFER_SIZE], const unsigned char auth_key[SMQV_PKEY_SIZE], const unsigned char token_key[MSS_PKEY_SIZE]) {
 	unsigned int index = 0;
 	sprintf(buffer, "%u %s", id, cname);
-	index += strlen(buffer);
+	index += strlen(buffer) + 1;
 	memcpy(buffer + index, time, TIME_BUFFER_SIZE);
 	index += TIME_BUFFER_SIZE;
 	memcpy(buffer + index, valid, TIME_BUFFER_SIZE);
@@ -168,7 +169,7 @@ unsigned int cert_split_info(const unsigned char buffer[], unsigned int *id, cha
 	sscanf(buffer, "%u ", id);
 	while(buffer[index++] != ' ');
 	strcpy(cname, buffer + index);
-	index += strlen(cname);
+	index += strlen(cname) + 1;
 	memcpy(time, buffer + index, TIME_BUFFER_SIZE);
 	index += TIME_BUFFER_SIZE;
 	memcpy(valid, buffer + index, TIME_BUFFER_SIZE);
@@ -209,7 +210,7 @@ int main() {
 	/**
 	 * CSR
 	 */
-	generate_csr(id, cname, time, auth_key, token_pkey, token_skey, csr);
+	generate_csr(id, cname, auth_key, token_pkey, token_skey, csr);
 	if(read_csr(&id, cname, time, auth_key, token_pkey, csr_signature, csr))
 		printf("CSR generation/read - OK\n");
 	else
