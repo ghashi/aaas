@@ -1,3 +1,5 @@
+require_relative '../../../../lib/certificate_wrapper'
+
 class Api::V1::UsersController < ApplicationController
   def login
     begin
@@ -27,6 +29,14 @@ class Api::V1::UsersController < ApplicationController
       puts e.message
       head :bad_request
     end
+  end
+
+  def ecdsa_pkey
+    render text: CertificateWrapper.ca_pkey
+  end
+
+  def ntru_pkey
+    render text: CertificateWrapper.ntru_pkey
   end
 
   private

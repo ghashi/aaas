@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   # See how all your routes lay out with "rake routes".
   post '/login' => 'api/v1/users#login'
   post '/register' => 'api/v1/users#register'
+  get '/ecdsa_pkey' => 'api/v1/users#ecdsa_pkey'
+  get '/ntru_pkey' => 'api/v1/users#ntru_pkey'
 
   # You can have the root of your site routed with "root"
    root 'users#index'
