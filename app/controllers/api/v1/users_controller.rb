@@ -1,6 +1,10 @@
 require_relative '../../../../lib/certificate_wrapper'
+require_relative '../../../../lib/certificate_wrapper/certificate_wrapper'
+require_relative '../../../../lib/crypto_wrapper/crypto_wrapper.so'
 
 class Api::V1::UsersController < ApplicationController
+  skip_before_filter  :verify_authenticity_token
+
   def login
     begin
       decrypted_params = asymmetric_decrypt params
@@ -22,9 +26,8 @@ class Api::V1::UsersController < ApplicationController
   def register
     begin
       nonce = User.find(params[:id]).nonce
-      return head :bad_request unless CryptoWrapper.verify_hmac(params[:tag], params[:csr], nonce)
-      # TODO
-      render json: {certificate: "certificate"}
+      return head :bad_request unless ::CryptoWrapper.verify_hmac(params[:tag], params[:csr], nonce)
+      render json: {certificate: certificate_of(params[:csr])}
     rescue Exception => e
       puts e.message
       head :bad_request
@@ -42,8 +45,11 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def asymmetric_decrypt(params)
-    #TODO
-    params
+    CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
+  end
+
+  def certificate_of(csr)
+    ::CertificateWrapper.generate_certificate(csr, CertificateWrapper.valid, CertificateWrapper.ca_skey)
   end
 
   def is_valid(token)

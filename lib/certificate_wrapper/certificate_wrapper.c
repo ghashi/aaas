@@ -5,7 +5,7 @@
 #include "certificate.h"
 #include "ntru.h"
 
-#define NTRU_BUFFER_SIZE 30000
+#define NTRU_BUFFER_SIZE 25000
 
 static VALUE t_init(VALUE self){
   return self;
