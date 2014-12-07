@@ -25,6 +25,9 @@ class UsersController < ApplicationController
   # POST /users.json
   def create
     @user = User.new(user_params)
+    @user.token_count = 0
+    @user.pkey = 0
+    @user.nonce = SecureRandom.hex(16)
 
     respond_to do |format|
       if @user.save
@@ -69,6 +72,6 @@ class UsersController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def user_params
-      params.require(:user).permit(:name, :token_count, :pkey)
+      params.require(:user).permit(:name)
     end
 end

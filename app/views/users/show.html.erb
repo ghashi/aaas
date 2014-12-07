@@ -1,6 +1,11 @@
 <p id="notice"><%= notice %></p>
 
 <p>
+  <strong>Id:</strong>
+  <%= @user.id %>
+</p>
+
+<p>
   <strong>Name:</strong>
   <%= @user.name %>
 </p>
@@ -13,6 +18,11 @@
 <p>
   <strong>Pkey:</strong>
   <%= @user.pkey %>
+</p>
+
+<p>
+  <strong>Nonce:</strong>
+  <span class="text-primary"><%= @user.nonce %></span>
 </p>
 
 <%= link_to 'Edit', edit_user_path(@user) %> |

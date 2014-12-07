@@ -81,7 +81,7 @@ CCDLFLAGS = -fPIC
 CFLAGS   = $(CCDLFLAGS) $(cflags)  -fPIC $(ARCH_FLAG)
 INCFLAGS = -I. -I$(arch_hdrdir) -I$(hdrdir)/ruby/backward -I$(hdrdir) -I$(srcdir)
 DEFS     = 
-CPPFLAGS =  -I/home/guilherme/.rvm/rubies/ruby-2.1.2/include -I/home/guilherme/tcc/aaas/lib/crypto_wrapper  $(DEFS) $(cppflags)
+CPPFLAGS =  -I/home/guilherme/.rvm/rubies/ruby-2.1.2/include -I/home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate/hashbasedsignature-code/workspace/include -I/home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate/micro-ecc -I/home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate  $(DEFS) $(cppflags)
 CXXFLAGS = $(CCDLFLAGS) $(cxxflags) $(ARCH_FLAG)
 ldflags  = -L. -fstack-protector -rdynamic -Wl,-export-dynamic
 dldflags =  
@@ -120,8 +120,8 @@ TOUCH = exit >
 
 preload = 
 
-libpath = . $(libdir) /home/guilherme/.rvm/rubies/ruby-2.1.2/lib /home/guilherme/tcc/aaas/lib/crypto_wrapper
-LIBPATH =  -L. -L$(libdir) -Wl,-R$(libdir) -L/home/guilherme/.rvm/rubies/ruby-2.1.2/lib -Wl,-R/home/guilherme/.rvm/rubies/ruby-2.1.2/lib -L/home/guilherme/tcc/aaas/lib/crypto_wrapper -Wl,-R/home/guilherme/tcc/aaas/lib/crypto_wrapper
+libpath = . $(libdir) /home/guilherme/.rvm/rubies/ruby-2.1.2/lib /home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate/bin
+LIBPATH =  -L. -L$(libdir) -Wl,-R$(libdir) -L/home/guilherme/.rvm/rubies/ruby-2.1.2/lib -Wl,-R/home/guilherme/.rvm/rubies/ruby-2.1.2/lib -L/home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate/bin -Wl,-R/home/guilherme/tcc/aaas/lib/certificate_wrapper/certificate/bin
 DEFFILE = 
 
 CLEANFILES = mkmf.log
@@ -132,13 +132,13 @@ extout =
 extout_prefix = 
 target_prefix = 
 LOCAL_LIBS = 
-LIBS = $(LIBRUBYARG_SHARED) -lcrypto  -lpthread -ldl -lcrypt -lm   -lc
-ORIG_SRCS = crypto_wrapper.c
+LIBS = $(LIBRUBYARG_SHARED) -lcertificate -lcrypto  -lpthread -ldl -lcrypt -lm   -lc
+ORIG_SRCS = certificate_wrapper.c
 SRCS = $(ORIG_SRCS) 
-OBJS = crypto_wrapper.o
-HDRS = $(srcdir)/mss.h $(srcdir)/sponge.h $(srcdir)/util.h $(srcdir)/winternitz.h $(srcdir)/hmac.h $(srcdir)/aes_128.h $(srcdir)/retain.h $(srcdir)/TI_aes.h $(srcdir)/benchmark.h $(srcdir)/test.h $(srcdir)/mmo.h
-TARGET = crypto_wrapper
-TARGET_NAME = crypto_wrapper
+OBJS = certificate_wrapper.o
+HDRS = 
+TARGET = certificate_wrapper
+TARGET_NAME = certificate_wrapper
 TARGET_ENTRY = Init_$(TARGET_NAME)
 DLLIB = $(TARGET).so
 EXTSTATIC = 
@@ -189,7 +189,7 @@ install-rb-default: pre-install-rb-default
 pre-install-rb: Makefile
 pre-install-rb-default: Makefile
 pre-install-rb-default:
-	$(ECHO) installing default crypto_wrapper libraries
+	$(ECHO) installing default certificate_wrapper libraries
 $(TIMESTAMP_DIR)/.RUBYARCHDIR.time:
 	$(Q) $(MAKEDIRS) $(@D) $(RUBYARCHDIR)
 	$(Q) $(TOUCH) $@
