@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include "certificate.h"
+#include "cert_time.h"
 #include "ntru.h"
 
 #define NTRU_BUFFER_SIZE 25000
@@ -126,12 +127,40 @@ static VALUE t_ntru_decrypt(VALUE self, VALUE r_skey, VALUE r_ciphertext){
   return rb_str_new2(plaintext);
 }
 
+static VALUE t_get_csr_pkey(VALUE self, VALUE r_csr){
+  unsigned char csr_pkey[MSS_PKEY_SIZE];
+  char encoded_csr_pkey[2 * MSS_PKEY_SIZE];
+  unsigned int id_cname_size;
+  unsigned char *decoded_csr;
+  unsigned int   decoded_csr_len;
+  char *csr;
+  unsigned int   csr_len;
+  VALUE str;
+
+  str            = StringValue(r_csr);
+  csr            = RSTRING_PTR(str);
+  csr_len  = RSTRING_LEN(str);
+
+  decoded_csr_len = csr_len;
+  decoded_csr     = malloc(csr_len);
+
+  base64decode(csr, csr_len, decoded_csr, &decoded_csr_len);
+  id_cname_size = strlen(decoded_csr);
+
+  memcpy(csr_pkey, decoded_csr + id_cname_size + TIME_BUFFER_SIZE + SMQV_PKEY_SIZE + 1, MSS_PKEY_SIZE);
+
+  base64encode(csr_pkey, MSS_PKEY_SIZE, encoded_csr_pkey, 2 * MSS_PKEY_SIZE);
+
+  return rb_str_new2(encoded_csr_pkey);
+}
+
 VALUE cCertificateWrapper;
 
 void Init_certificate_wrapper() {
   cCertificateWrapper = rb_define_class("CertificateWrapper", rb_cObject);
   rb_define_method(cCertificateWrapper, "initialize", t_init, 0);
   rb_define_singleton_method(cCertificateWrapper, "generate_certificate", t_generate_certificate, 3);
+  rb_define_singleton_method(cCertificateWrapper, "get_csr_pkey", t_get_csr_pkey, 1);
   rb_define_singleton_method(cCertificateWrapper, "ecdsa_keygen", t_ecdsa_keygen, 0);
   rb_define_singleton_method(cCertificateWrapper, "ntru_keygen", t_ntru_keygen, 0);
   rb_define_singleton_method(cCertificateWrapper, "ntru_encrypt", t_ntru_encrypt, 2);

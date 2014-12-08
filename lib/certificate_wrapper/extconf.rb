@@ -19,6 +19,10 @@ unless find_header('certificate.h')
   abort "certificate.h is missing"
 end
 
+unless find_header('cert_time.h')
+  abort "cert_time.h is missing"
+end
+
 unless find_header('ntru.h')
   abort "ntru.h is missing"
 end
