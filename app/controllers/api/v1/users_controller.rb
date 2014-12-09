@@ -11,18 +11,11 @@ class Api::V1::UsersController < ApplicationController
       # TODO arrumar token e apagar "count = 1"
       #is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
       count = 1
-      p "id: " + params[:id]
       is_count_valid(count) ? user = User.find(params[:id]) : raise("invalid count (> 1024)")
       count > user.token_count ? user.token_count = count : raise("count (#{count}) < user.count (#{user.token_count})")
-      p params[:sig]
-      p params[:token]
-      p user.pkey
-      p CryptoWrapper.verify(params[:token], params[:sig], user.pkey )
       if CryptoWrapper.verify(params[:token], params[:sig], user.pkey ) && user.save
-        p "hahahah"
-        render json: {session_key: session_key}
+        render json: {"session_key" => session_key, "cname" => user.name}
       else
-        p "destroy:e  "
         #user.destroy
         raise "user destroyed due to invalid request"
       end
