@@ -6,7 +6,7 @@
 #include "cert_time.h"
 #include "ntru.h"
 
-#define NTRU_BUFFER_SIZE 25000
+#define NTRU_BUFFER_SIZE 100
 
 static VALUE t_init(VALUE self){
   return self;
@@ -70,11 +70,12 @@ static VALUE t_ntru_keygen(VALUE self){
 static VALUE t_ntru_encrypt(VALUE self, VALUE r_pkey, VALUE r_plaintext){
   char *pkey;
   unsigned int  pkey_len;
-	char ciphertext[NTRU_BUFFER_SIZE];
 	char *plaintext;
-  unsigned char encoded_ciphertext[2*NTRU_BUFFER_SIZE];
+  unsigned char *encoded_ciphertext;
+  unsigned int  encoded_ciphertext_len;
   unsigned char *decoded_pkey;
   unsigned int   decoded_pkey_len;
+	char *ciphertext;
   NtruEncParams params = EES613EP1;
 	unsigned short ciphertext_len = ntru_enc_len(&params);
   VALUE str;
@@ -88,9 +89,18 @@ static VALUE t_ntru_encrypt(VALUE self, VALUE r_pkey, VALUE r_plaintext){
   decoded_pkey_len = pkey_len;
   decoded_pkey = malloc(pkey_len);
 
+  ciphertext_len = ntru_ciphertext_len();
+  ciphertext = malloc(ciphertext_len);
+
   base64decode(pkey, pkey_len, decoded_pkey, &decoded_pkey_len);
   ntru_encryption(decoded_pkey, plaintext, ciphertext);
-  base64encode(ciphertext, ciphertext_len, encoded_ciphertext, 2 * NTRU_BUFFER_SIZE);
+
+  encoded_ciphertext_len = 2 * ciphertext_len;
+  encoded_ciphertext = malloc(encoded_ciphertext_len);
+
+  base64encode(ciphertext, ciphertext_len, encoded_ciphertext, encoded_ciphertext_len);
+
+  free(ciphertext);
 
   return rb_str_new2(encoded_ciphertext);
 }

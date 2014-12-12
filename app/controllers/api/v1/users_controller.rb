@@ -53,7 +53,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def asymmetric_decrypt(params)
-      p ::CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
+    ::CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
   end
 
   def certificate_of(csr)
@@ -66,8 +66,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def session_key
-    # TODO
-    "session_key"
+    # TODO change sessino_key
+    "UPB5iiqKPo37pi0whIwr/g=="
   end
 
   def is_count_valid(count)
