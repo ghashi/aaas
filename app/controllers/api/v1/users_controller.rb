@@ -8,19 +8,18 @@ class Api::V1::UsersController < ApplicationController
   def login
     begin
       decrypted_token = asymmetric_decrypt params
-      # TODO arrumar token e apagar "count = 1"
-      #is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
-      count = 1
+      raise("id from request is different from id from token") if params[:id] != decrypted_token["id"]
+      is_valid(decrypted_token) ? count = Integer(decrypted_token["count"]) : raise("invalid token")
       is_count_valid(count) ? user = User.find(params[:id]) : raise("invalid count (> 1024)")
       count > user.token_count ? user.token_count = count : raise("count (#{count}) < user.count (#{user.token_count})")
       if CryptoWrapper.verify(params[:token], params[:sig], user.pkey ) && user.save
-        render json: {"session_key" => session_key, "cname" => user.name}
+        render json: {"session_key" => decrypted_token["session_key"], "cname" => user.name}
       else
         #user.destroy
         raise "user destroyed due to invalid request"
       end
     rescue Exception => e
-      puts e.message
+      logger.error e.message
       head :bad_request
     end
   end
@@ -53,7 +52,10 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def asymmetric_decrypt(params)
-    ::CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
+    decrypted_val = ::CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
+    decoded_val = ActiveSupport::JSON.decode decrypted_val
+    logger.debug "Api::V1::UsersController.asymmetric_decrypt decrypted_val=#{decrypted_val} decoded_val=#{decoded_val}"
+    decoded_val
   end
 
   def certificate_of(csr)
@@ -61,13 +63,7 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def is_valid(token)
-    token.has_key?("key") && token.has_key?("timestamp") &&
-      token.has_key?("count") && token.has_key?("index")
-  end
-
-  def session_key
-    # TODO change sessino_key
-    "UPB5iiqKPo37pi0whIwr/g=="
+    token.has_key?("session_key") && token.has_key?("count") && token.has_key?("id")
   end
 
   def is_count_valid(count)

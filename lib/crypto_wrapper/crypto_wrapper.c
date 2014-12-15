@@ -49,8 +49,8 @@ static VALUE t_verify_hmac(VALUE self, VALUE r_tag, VALUE r_msg, VALUE r_session
 }
 
 static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_key){
-  unsigned char *message, *signature, *pkey;
-  int message_len, signature_len, key_len;
+  unsigned char *message, *signature, *pkey, *decoded_signature, *decoded_pkey;
+  int message_len, signature_len, pkey_len, decoded_signature_len, decoded_pkey_len;
   VALUE str;
   VALUE res = Qfalse;
 
@@ -63,15 +63,23 @@ static VALUE t_verify(VALUE self, VALUE r_message, VALUE r_signature, VALUE r_ke
   signature_len = RSTRING_LEN(str);
   str = StringValue(r_key);
   pkey = RSTRING_PTR(str);
-  key_len = RSTRING_LEN(str);
+  pkey_len = RSTRING_LEN(str);
 
-  base64decode(message, message_len, message, &message_len);
-  base64decode(signature, signature_len, signature, &signature_len);
-  base64decode(pkey, key_len, pkey, &key_len);
+  decoded_signature = malloc(signature_len);
+  decoded_signature_len = signature_len;
+  decoded_pkey = malloc(pkey_len);
+  decoded_pkey_len = pkey_len;
 
-  if(mss_verify(signature, pkey, message)){
+  base64decode(signature, signature_len, decoded_signature, &decoded_signature_len);
+  base64decode(pkey, pkey_len, decoded_pkey, &decoded_pkey_len);
+
+  if(mss_verify(decoded_signature, decoded_pkey, message)){
     res = Qtrue;
   }
+
+  free(decoded_signature);
+  free(decoded_pkey);
+
   return res;
 }
 
