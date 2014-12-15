@@ -7,14 +7,16 @@ class Api::V1::UsersController < ApplicationController
 
   def login
     begin
-      decrypted_params = asymmetric_decrypt params
-      is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
-      is_count_valid(count) ? user = User.find(decrypted_params[:id]) : raise("invalid count (> 1024)")
+      decrypted_token = asymmetric_decrypt params
+      # TODO arrumar token e apagar "count = 1"
+      #is_valid(decrypted_params[:token]) ? count = Integer(decrypted_params[:token][:count]) : raise("invalid token")
+      count = 1
+      is_count_valid(count) ? user = User.find(params[:id]) : raise("invalid count (> 1024)")
       count > user.token_count ? user.token_count = count : raise("count (#{count}) < user.count (#{user.token_count})")
       if CryptoWrapper.verify(params[:token], params[:sig], user.pkey ) && user.save
-        render json: {session_key: session_key}
+        render json: {"session_key" => session_key, "cname" => user.name}
       else
-        user.destroy
+        #user.destroy
         raise "user destroyed due to invalid request"
       end
     rescue Exception => e
@@ -25,9 +27,15 @@ class Api::V1::UsersController < ApplicationController
 
   def register
     begin
-      nonce = User.find(params[:id]).nonce
+      user = User.find(params[:id])
+      nonce = user.nonce
       return head :bad_request unless ::CryptoWrapper.verify_hmac(params[:tag], params[:csr], nonce)
-      render json: {certificate: certificate_of(params[:csr])}
+      user.pkey = ::CertificateWrapper.get_csr_pkey(params[:csr])
+      if user.save
+        render json: {certificate: certificate_of(params[:csr])}
+      else
+        head :bad_request
+      end
     rescue Exception => e
       puts e.message
       head :bad_request
@@ -45,7 +53,7 @@ class Api::V1::UsersController < ApplicationController
   private
 
   def asymmetric_decrypt(params)
-    CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
+    ::CertificateWrapper.ntru_decrypt(CertificateWrapper.ntru_skey, params[:token])
   end
 
   def certificate_of(csr)
@@ -58,8 +66,8 @@ class Api::V1::UsersController < ApplicationController
   end
 
   def session_key
-    # TODO
-    "session_key"
+    # TODO change sessino_key
+    "UPB5iiqKPo37pi0whIwr/g=="
   end
 
   def is_count_valid(count)
